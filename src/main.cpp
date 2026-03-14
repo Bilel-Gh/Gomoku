@@ -19,68 +19,10 @@ int main() {
 
 	gui_init();
 
-	while (!WindowShouldClose()) {
-		// Keyboard shortcuts
-		if (IsKeyPressed(KEY_N)) {
-			// New game
-			init_game(state);
-			gui.undo_stack.clear();
-			gui.redo_stack.clear();
-			gui.ai_thinking = false;
-			gui.ai_time = 0;
-			gui.hint_move = -1;
-			tt_clear();
-		}
-		if (IsKeyPressed(KEY_M)) {
-			// Toggle mode
-			gui.mode = (gui.mode == MODE_PVA) ? MODE_PVP : MODE_PVA;
-			init_game(state);
-			gui.undo_stack.clear();
-			gui.redo_stack.clear();
-			gui.ai_thinking = false;
-			gui.ai_time = 0;
-			gui.hint_move = -1;
-			tt_clear();
-		}
-		if (IsKeyPressed(KEY_T)) {
-			gui.theme_idx = (gui.theme_idx + 1) % 2;
-		}
-		if (IsKeyPressed(KEY_H)) {
-			gui.show_hint = !gui.show_hint;
-			if (gui.show_hint && !state.game_over) {
-				gui.hint_move = ai_suggest_move(state, state.current);
-			}
-		}
-		if (IsKeyPressed(KEY_D)) {
-			gui.show_heatmap = !gui.show_heatmap;
-		}
-
-		// Undo (Z)
-		if (IsKeyPressed(KEY_Z) && !gui.undo_stack.empty() && !gui.ai_thinking) {
-			gui.redo_stack.push_back(make_snapshot(state));
-			restore_snapshot(state, gui.undo_stack.back());
-			gui.undo_stack.pop_back();
-			// In PvA mode, undo twice (undo AI move + undo player move)
-			if (gui.mode == MODE_PVA && !gui.undo_stack.empty()) {
-				gui.redo_stack.push_back(make_snapshot(state));
-				restore_snapshot(state, gui.undo_stack.back());
-				gui.undo_stack.pop_back();
-			}
-			gui.hint_move = -1;
-		}
-
-		// Redo (Y)
-		if (IsKeyPressed(KEY_Y) && !gui.redo_stack.empty() && !gui.ai_thinking) {
-			gui.undo_stack.push_back(make_snapshot(state));
-			restore_snapshot(state, gui.redo_stack.back());
-			gui.redo_stack.pop_back();
-			if (gui.mode == MODE_PVA && !gui.redo_stack.empty()) {
-				gui.undo_stack.push_back(make_snapshot(state));
-				restore_snapshot(state, gui.redo_stack.back());
-				gui.redo_stack.pop_back();
-			}
-			gui.hint_move = -1;
-		}
+	bool quit = false;
+	while (!quit) {
+		gui_poll_events(state, gui, quit);
+		if (quit) break;
 
 		// Human turn
 		bool human_turn = !state.game_over && !gui.ai_thinking;

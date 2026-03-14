@@ -63,7 +63,7 @@ L'IA utilise l'algorithme **Minimax avec elagage Alpha-Beta** :
 
 **Temps** : l'IA repond en moins de 0.5 seconde (en moyenne). Un timer s'affiche dans l'interface.
 
-## L'interface (Raylib)
+## L'interface (SDL2)
 
 - Plateau a gauche avec grille 19x19
 - Panneau d'info a droite (tour, timer, captures, boutons)
@@ -99,5 +99,5 @@ Gomoku/
     ai.cpp          <- minimax, alpha-beta, iterative deepening
     eval.cpp        <- heuristique (evaluation de position)
     zobrist.cpp     <- hash table + table de transposition
-    gui.cpp         <- affichage raylib
+    gui.cpp         <- affichage SDL2
 ```

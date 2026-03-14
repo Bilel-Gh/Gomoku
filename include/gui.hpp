@@ -1,7 +1,11 @@
 #pragma once
 
 #include "gomoku.hpp"
-#include "raylib.h"
+#include <SDL2/SDL.h>
+
+struct Color {
+	uint8_t r, g, b, a;
+};
 
 struct Theme {
 	Color board_bg;
@@ -32,6 +36,8 @@ void gui_init();
 void gui_draw(const GameState &s, const GuiState &g);
 int  gui_handle_input(GameState &s, GuiState &g);
 void gui_close();
+bool gui_should_close();
+void gui_poll_events(GameState &s, GuiState &g, bool &quit);
 
 // Convert board position to screen coords
 inline int board_x(int c) { return BOARD_MARGIN + c * CELL_SIZE; }

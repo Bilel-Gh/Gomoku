@@ -149,7 +149,7 @@ if ((node_count & 1023) == 0) {  // check toutes les 1024 noeuds
 
 ---
 
-## src/gui.cpp - Interface Raylib
+## src/gui.cpp - Interface SDL2
 
 | Element | Description |
 |---------|-------------|
@@ -160,6 +160,7 @@ if ((node_count & 1023) == 0) {  // check toutes les 1024 noeuds
 | `draw_panel()` | Panneau de droite (infos + boutons) |
 | `gui_draw()` | Appelle tout le rendu |
 | `gui_handle_input()` | Gere le clic sur le plateau |
+| `gui_poll_events()` | Gere les events SDL (clavier, souris, quit) |
 
 ---
 
@@ -167,11 +168,11 @@ if ((node_count & 1023) == 0) {  // check toutes les 1024 noeuds
 
 La boucle principale :
 ```
-while (fenetre ouverte) :
-    traiter les raccourcis clavier (N, M, T, H, D, Z, Y)
+while (!quit) :
+    gui_poll_events()  <- events SDL + raccourcis clavier
     si c'est le tour du humain -> traiter le clic
     si c'est le tour de l'IA -> lancer ai_get_move(), poser le coup
-    dessiner tout
+    gui_draw()
 ```
 
 **Les raccourcis :**
