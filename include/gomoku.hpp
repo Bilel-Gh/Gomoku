@@ -50,6 +50,8 @@ struct GameState {
 	uint64_t  zhash;
 	bool      game_over;
 	Cell      winner;
+	int       pending_five_pos;   // position of unbroken five awaiting opponent response (-1 = none)
+	Cell      pending_five_color; // color that made the pending five
 };
 
 struct Move {
@@ -65,6 +67,8 @@ struct MoveUndo {
 	Cell     prev_current;
 	int      prev_move_count;
 	int      prev_last_move;
+	int      prev_pending_five_pos;
+	Cell     prev_pending_five_color;
 };
 
 struct TTEntry {
@@ -85,6 +89,8 @@ struct Snapshot {
 	uint64_t zhash;
 	bool     game_over;
 	Cell     winner;
+	int      pending_five_pos;
+	Cell     pending_five_color;
 };
 
 // board.cpp

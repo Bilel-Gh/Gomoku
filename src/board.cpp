@@ -11,6 +11,8 @@ void init_game(GameState &s) {
 	s.zhash = 0;
 	s.game_over = false;
 	s.winner = EMPTY;
+	s.pending_five_pos = -1;
+	s.pending_five_color = EMPTY;
 }
 
 // Check captures in all 8 directions, return count of pairs captured
@@ -70,6 +72,7 @@ void apply_captures(GameState &s, int pos, Cell color, MoveUndo &undo) {
 
 // Check if color has 5+ in a row through position pos
 bool check_five(const GameState &s, int pos, Cell color) {
+	if (s.board[pos] != color) return false;
 	int r = row_of(pos), c = col_of(pos);
 
 	for (int d = 0; d < 4; d++) {
@@ -144,7 +147,9 @@ bool check_win(GameState &s, int pos, Cell color) {
 	if (check_five(s, pos, color)) {
 		// Endgame capture rule: check if opponent can break it
 		if (can_opponent_break_five(s, pos, color)) {
-			return false; // game continues
+			s.pending_five_pos = pos;
+			s.pending_five_color = color;
+			return false; // opponent gets one chance to break it
 		}
 		s.game_over = true;
 		s.winner = color;
@@ -178,7 +183,25 @@ bool place_stone(GameState &s, int pos) {
 	MoveUndo dummy;
 	apply_captures(s, pos, color, dummy);
 
-	// Check win
+	// Check if opponent had a pending five that we failed to break
+	if (s.pending_five_pos >= 0 && s.pending_five_color != color) {
+		// Check if the five is still intact after our captures
+		if (check_five(s, s.pending_five_pos, s.pending_five_color)) {
+			// Opponent's five survives — they win (unless we won by captures)
+			if (s.captures[color - 1] < 5) {
+				s.game_over = true;
+				s.winner = s.pending_five_color;
+				s.pending_five_pos = -1;
+				s.pending_five_color = EMPTY;
+				return true;
+			}
+		}
+		// Five was broken or we won by captures — clear pending
+		s.pending_five_pos = -1;
+		s.pending_five_color = EMPTY;
+	}
+
+	// Check win for current move
 	check_win(s, pos, color);
 
 	// Switch turn
@@ -199,6 +222,8 @@ Snapshot make_snapshot(const GameState &s) {
 	snap.zhash = s.zhash;
 	snap.game_over = s.game_over;
 	snap.winner = s.winner;
+	snap.pending_five_pos = s.pending_five_pos;
+	snap.pending_five_color = s.pending_five_color;
 	return snap;
 }
 
@@ -212,4 +237,6 @@ void restore_snapshot(GameState &s, const Snapshot &snap) {
 	s.zhash = snap.zhash;
 	s.game_over = snap.game_over;
 	s.winner = snap.winner;
+	s.pending_five_pos = snap.pending_five_pos;
+	s.pending_five_color = snap.pending_five_color;
 }

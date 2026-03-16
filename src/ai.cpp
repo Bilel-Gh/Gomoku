@@ -17,6 +17,8 @@ void ai_apply_move(GameState &s, int pos, MoveUndo &undo) {
 	undo.prev_current = s.current;
 	undo.prev_move_count = s.move_count;
 	undo.prev_last_move = s.last_move;
+	undo.prev_pending_five_pos = s.pending_five_pos;
+	undo.prev_pending_five_color = s.pending_five_color;
 	undo.num_captured = 0;
 
 	Cell color = s.current;
@@ -48,6 +50,8 @@ void ai_undo_move(GameState &s, MoveUndo &undo) {
 	// Remove the placed stone
 	s.board[undo.pos] = EMPTY;
 	s.zhash = undo.prev_hash;
+	s.pending_five_pos = undo.prev_pending_five_pos;
+	s.pending_five_color = undo.prev_pending_five_color;
 }
 
 // Generate candidate moves (within distance 2 of existing stones)
